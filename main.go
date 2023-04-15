@@ -37,6 +37,9 @@ func main() {
 
 	saveConfigFlag := flag.String("save", "", "Save the current configuration as `NAME`")
 	applyConfigFlag := flag.String("apply", "", "apply the configuration with the name `NAME`")
+
+	listConfigFlag := flag.Bool("list", false, "list all saved configurations")
+
 	flag.Parse()
 
 	baseConfigPath, err = os.UserHomeDir()
@@ -73,18 +76,26 @@ func main() {
 
 	}
 
+	if *listConfigFlag {
+		listConfigs()
+		return
+	}
+
 	saveConfigName := *saveConfigFlag
 	applyConfigName := *applyConfigFlag
 
 	if len(saveConfigName) > 0 {
 		saveConfig(configs, saveConfigName)
 		fmt.Println(">> Saved:", filepath.Join(baseConfigPath, saveConfigName))
+		return
 	}
 
 	if len(applyConfigName) > 0 {
 		applyConfig(applyConfigName)
 		fmt.Println(">> Applied:", filepath.Join(baseConfigPath, applyConfigName))
+		return
 	}
+
 }
 
 func saveConfig(configs []Config, name string) {
@@ -144,4 +155,16 @@ func getDisplays(arr *C.uint, size C.uint) []C.CGDirectDisplayID {
 	}
 
 	return slice
+}
+
+func listConfigs() {
+	dirEntries, err := os.ReadDir(filepath.Join(baseConfigPath))
+	bail(err)
+	for _, entry := range dirEntries {
+		fname := entry.Name()
+		if !strings.HasSuffix(fname, ".json") {
+			continue
+		}
+		fmt.Println("- ", strings.TrimSuffix(fname, ".json"))
+	}
 }
