@@ -8,8 +8,10 @@ import (
 	"fmt"
 	"unsafe"
 )
+
 import (
 	"flag"
+	"github.com/s0rg/compflag"
 	"os"
 	"path/filepath"
 	"strings"
@@ -39,6 +41,8 @@ func main() {
 	applyConfigFlag := flag.String("apply", "", "apply the configuration with the name `NAME`")
 
 	listConfigFlag := flag.Bool("list", false, "list all saved configurations")
+
+	compflag.Complete()
 
 	flag.Parse()
 
